@@ -3,7 +3,8 @@
 
 void CPU::reset(Memory& memory){
     PC = 0xFFFC;
-    SP = 0x01FF; // This is transferring the stack ptr to 0100.
+    // SP = 0x01FF; // This is transferring the stack ptr to 0100.
+    SP = 0x0100; // This is transferring the stack ptr to 0100.
     C = Z = I = D = B = V = N = 0;
     A = X = Y = 0;
     memory.Initialize();
@@ -12,7 +13,8 @@ void CPU::reset(Memory& memory){
 void CPU::ExecuteCPU(u32 Cycles, Memory& memory){
     // Iterating cycles, while fetching instructions
     while(Cycles > 0){
-        Byte Instruction = FetchByte(Cycles, memory);
+        Byte Instruction = FetchByte(Cycles, memory); // get each instruction
+
         // Emulating the instructions
         switch (Instruction){
         case CPU_OP_CODES::INS_LDA_IM: // Immediate means the first byte is the op-code, and the second byte is actual value to load.
@@ -43,8 +45,8 @@ void CPU::ExecuteCPU(u32 Cycles, Memory& memory){
 
             // This is where we need stack ptr
             memory.WriteWord(PC - 1, SP, Cycles);
+            SP += 2;
             PC = SubAddress;
-                
             Cycles--;
         } break;
             
@@ -72,7 +74,7 @@ Byte CPU::FetchWord(u32& Cycles, Memory& memory){
     Data |= (memory[PC] << 8);
     PC++;
 
-    Cycles += 2;
+    Cycles -= 2;
 
     /**
     * @brief
